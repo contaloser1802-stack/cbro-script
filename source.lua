@@ -22,7 +22,7 @@ if not isfolder("astrixsete/"..tostring(game.GameId)) then
 end
 --vars
 -- LINHA CORRIGIDA ABAIXO
-local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/main/library.lua"))()
+local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/contaloser1802-stack/cbro-script/main/library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
