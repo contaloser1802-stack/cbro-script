@@ -186,7 +186,6 @@ function getWeaponInfo()
         information["name"] = weapon.Name
         information["melee"] = false
         information["aim_assist"] = library.flags[weapType.."_assist"]
-		information["aimbot_bind"] = library.flags["aimbot_keybind"]
         information["silent_aim"] = library.flags[weapType.."_silent"]
         information["triggerbot"] = library.flags[weapType.."_triggerbot"]
         information["assist_fov"] = library.flags[weapType.."_assist_fov"]
@@ -678,7 +677,6 @@ aimbotGroup:addToggle({text = "Auto Pistol",flag = "auto_pistol",callback = func
         end
     end
 end})
-aimbotGroup:addKeybind({text = "Aimbot Bind",flag = "aimbot_keybind",key = Enum.KeyCode.RightShift})
 aimbotGroup:addKeybind({text = "Triggerbind",flag = "trigger_keybind",key = Enum.KeyCode.LeftAlt})
 aimbotGroup:addList({text = "Weapon",skipflag = true,flag = "aimbot_weapon",values = {"Rifle","Pistol","Heavy Pistol","Awp","Scout","Other"},callback = function(val)
     rifleFrame.Visible = val == "Rifle"
