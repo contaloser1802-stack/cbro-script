@@ -5,7 +5,7 @@
 | (_| | | (_) | | | (_| |
  \__,_|_|\___/|_|  \__,_|  
 
-alora, a free and open source Counter Blox script created by sjors
+astrixsete, a free and open source Counter Blox script created by sjors
 
 --]]
 repeat wait() until game:IsLoaded()
@@ -33,7 +33,7 @@ local mouse = localPlayer:GetMouse()
 local debris = game:GetService("Debris")
 local client = getsenv(localPlayer.PlayerGui.Client)
 
-local aloraWatermark = Drawing.new("Text");aloraWatermark.Font = Drawing.Fonts.Plex;aloraWatermark.Position = Vector2.new(50,24);aloraWatermark.Visible = false;aloraWatermark.Size = 16;aloraWatermark.Color = Color3.new(1,1,1);aloraWatermark.Outline = true
+local astrixseteWatermark = Drawing.new("Text");astrixseteWatermark.Font = Drawing.Fonts.Plex;astrixseteWatermark.Position = Vector2.new(50,24);astrixseteWatermark.Visible = false;astrixseteWatermark.Size = 16;astrixseteWatermark.Color = Color3.new(1,1,1);astrixseteWatermark.Outline = true
 local speclistText = Drawing.new("Text");speclistText.Font = Drawing.Fonts.Plex;speclistText.Position = Vector2.new(8,305);speclistText.Visible = false;speclistText.Size = 16;speclistText.Color = Color3.new(1,1,1);speclistText.Outline = true
 
 local skyboxes = {
@@ -878,7 +878,7 @@ end})
 otherGroup2:addToggle({text = "Backtrack",flag = "backtrack_enabled"})
 otherGroup2:addToggle({text = "Hitsound",flag = "hitsound_enabled"})
 otherGroup2:addToggle({text = "Watermark",flag = "watermark_enabled",callback = function(val)
-    aloraWatermark.Visible = val
+    astrixseteWatermark.Visible = val
 end})
 otherGroup2:addToggle({text = "Splatoon Sound Effects",flag = "splatoon_sounds",callback = function(val)-- ;)
     for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do
@@ -1184,7 +1184,7 @@ function onStep()
         local seconds = string.len(sec) == 2 and sec or "0"..sec
         local minutes = string.len(min) == 2 and min or "0"..min
         local hours = string.len(hrs) == 2 and hrs or "0"..hrs
-        aloraWatermark.Text = "astrixsete | "..ver.." | "..hours..":"..minutes..":"..seconds
+        astrixseteWatermark.Text = "astrixsete | "..ver.." | "..hours..":"..minutes..":"..seconds
     end
 end
 runService.RenderStepped:Connect(onStep)
