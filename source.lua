@@ -21,7 +21,7 @@ if not isfolder("astrixsete/"..tostring(game.GameId)) then
     makefolder("astrixsete/"..tostring(game.GameId))
 end
 --vars
-local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/main/library.lua"))()
+local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/contaloser1802-stack/cbro-script/main/library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
@@ -33,7 +33,7 @@ local mouse = localPlayer:GetMouse()
 local debris = game:GetService("Debris")
 local client = getsenv(localPlayer.PlayerGui.Client)
 
-local astrixseteWatermark = Drawing.new("Text");astrixseteWatermark.Font = Drawing.Fonts.Plex;astrixseteWatermark.Position = Vector2.new(50,24);astrixseteWatermark.Visible = false;astrixseteWatermark.Size = 16;astrixseteWatermark.Color = Color3.new(1,1,1);astrixseteWatermark.Outline = true
+local astrixseteWatermark = Drawing.new("Text");astrixWatermark.Font = Drawing.Fonts.Plex;astrixWatermark.Position = Vector2.new(50,24);astrixWatermark.Visible = false;astrixWatermark.Size = 16;astrixWatermark.Color = Color3.new(1,1,1);astrixWatermark.Outline = true
 local speclistText = Drawing.new("Text");speclistText.Font = Drawing.Fonts.Plex;speclistText.Position = Vector2.new(8,305);speclistText.Visible = false;speclistText.Size = 16;speclistText.Color = Color3.new(1,1,1);speclistText.Outline = true
 
 local skyboxes = {
@@ -138,20 +138,6 @@ local hitboxList = {
     Legs = {"LeftLowerLeg","RightLowerLeg"}
 }
 
-local aimbotActive = false -- Variável para rastrear o estado do Toggle
-local unlockInventory,unlocked = false,false
-local skins = {{"TKnife_Stock"},{"CTKnife_Stock"},{"TGlove_Stock"},{"CTGlove_Stock"}}
-local btInfo = {parent = nil,folder = nil}
-local preventBt = false
-local silentPart = nil
-local hookJp = nil
-local hookWs = nil
-local timeout = 0
-local meta = getrawmetatable(game)
-setreadonly(meta,false)
-local oldNamecall = meta.__namecall
-local oldNewindex = meta.__newindex
-
 --functions
 function encodePos(pos)
     return Vector3.new(((pos.X - 74312) * 4 + 1325) * 13,(pos.Y + 3183421) * 4 - 4201432,(pos.Z * 41 - 581357) * 2)
@@ -235,27 +221,6 @@ function getNearest(visOnly,team)
     return player,nearest
 end
 
-local lastKeybindState = false -- Variável auxiliar para o Toggle
-function checkAimbotActivation()
-    local key = library.flags["aimbot_keybind"]
-    local mode = library.flags["aimbot_mode"]
-    local keyIsDown = isButtonDown(key)
-
-    if mode == "Always" then
-        return true
-    elseif mode == "Hold" then
-        return keyIsDown
-    elseif mode == "Toggle" then
-        if keyIsDown and not lastKeybindState then -- Verifica se a tecla foi Pressionada (rising edge)
-            aimbotActive = not aimbotActive
-        end
-        lastKeybindState = keyIsDown -- Atualiza o estado da tecla para o próximo frame
-        return aimbotActive
-    end
-
-    return false
-end
-
 function isButtonDown(key)
     if string.find(tostring(key),"KeyCode") then
         return userInputService:IsKeyDown(key) 
@@ -324,7 +289,7 @@ function createTracer(to,from)
 end
 
 oldSounds = {}
-for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY CODE!!!
+for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY CODE!!!!
 	if v:IsA("Sound") then
 		if v.Name == "Lose" then
 			oldSounds["Lose"] = v.SoundId
@@ -466,6 +431,19 @@ function updateViewmodel()
     end
 end
 
+local unlockInventory,unlocked = false,false
+local skins = {{"TKnife_Stock"},{"CTKnife_Stock"},{"TGlove_Stock"},{"CTGlove_Stock"}}
+local btInfo = {parent = nil,folder = nil}
+local preventBt = false
+local silentPart = nil
+local hookJp = nil
+local hookWs = nil
+local timeout = 0
+local meta = getrawmetatable(game)
+setreadonly(meta,false)
+local oldNamecall = meta.__namecall
+local oldNewindex = meta.__newindex
+
 for i,v in pairs(localPlayer.PlayerGui.Client.Rarities:GetChildren()) do
     table.insert(skins,{v.Name})
 end
@@ -545,13 +523,8 @@ meta.__namecall = newcclosure(function(self,...)
                     hitsound.Volume = library.flags["hitsound_volume"]
                     hitsound:Destroy()
                 end
-                -- Lógica do Bullet Tracer corrigida para usar 'Arms' como ponto de partida
-                if library.flags["bullet_tracer"] and localPlayer.Character and camera:FindFirstChild("Arms") then
-                    local from = camera.Arms:FindFirstChild("Flash") -- Assumindo que o ponto de disparo é o 'Flash' no viewmodel 'Arms'
-                    if not from then 
-                        -- Se 'Flash' não for encontrado, tente o braço direito ou um ponto central
-                        from = camera.Arms:FindFirstChild("RightHand") or camera.Arms:FindFirstChild("RightArm") or camera.Arms.PrimaryPart
-                    end
+                if library.flags["bullet_tracer"] and localPlayer.Character and  camera:FindFirstChild("Arms") then
+                    local from = camera.Arms:FindFirstChild("Flash")
                     if from then
                         createTracer(decodePos(args[2]),from)
                     end
@@ -600,6 +573,48 @@ meta.__namecall = newcclosure(function(self,...)
     return oldNamecall(self, table.unpack(args, 1, argsCount))
 end)
 
+-- Hook para controlar o modo Aimbot
+local aimbotToggled = false
+
+userInputService.InputBegan:Connect(function(input, gameProcessed)
+    if gameProcessed or not library.flags["aimbot_enabled"] then return end
+
+    -- Obter a keybind configurada para Aimbot
+    local bindKey = library.flags["aimbot_keybind"]
+    
+    -- Comparar a tecla pressionada com a keybind
+    local isAimbotKey = (input.KeyCode ~= Enum.KeyCode.Unknown and input.KeyCode == bindKey) or 
+                        (input.UserInputType ~= Enum.UserInputType.None and input.UserInputType == bindKey)
+
+    if isAimbotKey then
+        local mode = library.flags["aimbot_mode"]
+        if mode == "Toggle" then
+            aimbotToggled = not aimbotToggled
+        end
+    end
+end)
+
+function isAimbotActive()
+    if not library.flags["aimbot_enabled"] then
+        return false
+    end
+
+    local mode = library.flags["aimbot_mode"]
+    local bindKey = library.flags["aimbot_keybind"]
+
+    if mode == "Always" then
+        return true
+    elseif mode == "Toggle" then
+        return aimbotToggled
+    elseif mode == "Hold" then
+        -- A função isButtonDown verifica se a tecla está pressionada
+        return isButtonDown(bindKey)
+    end
+    return false
+end
+
+-- fim da adição de lógica
+
 -- local firebullet = client.firebullet
 -- client.firebullet = function(self,...)
 -- 	if not menu.Enabled then
@@ -638,6 +653,30 @@ local heavypGroup,heavypFrame = aimbotTab:createGroup(1)
 local awpGroup,awpFrame = aimbotTab:createGroup(1)
 local scoutGroup,scoutFrame = aimbotTab:createGroup(1)
 local otherGroup,otherFrame = aimbotTab:createGroup(1)
+
+-- *** Adições para Aimbot: Keybind e Modo ***
+aimbotGroup:addToggle({text = "Enabled",flag = "aimbot_enabled"})
+aimbotGroup:addKeybind({text = "Aimbot Bind",flag = "aimbot_keybind",key = Enum.UserInputType.MouseButton2}) -- Padrão: Botão Direito
+aimbotGroup:addList({text = "Aimbot Mode",flag = "aimbot_mode",values = {"Hold","Toggle","Always"},default = "Hold"})
+-- *******************************************
+aimbotGroup:addToggle({text = "Teammates",flag = "aimbot_team"})
+aimbotGroup:addToggle({text = "Visible Only",flag = "aimbot_visonly"})
+aimbotGroup:addToggle({text = "Auto Pistol",flag = "auto_pistol",callback = function(val)
+    for i,v in next, replicatedStorage.Weapons:GetChildren() do
+        if v:FindFirstChild("Secondary") and v.Name ~= "CZ" then
+            v.Auto.Value = val
+        end
+    end
+end})
+aimbotGroup:addKeybind({text = "Triggerbind",flag = "trigger_keybind",key = Enum.KeyCode.LeftAlt})
+aimbotGroup:addList({text = "Weapon",skipflag = true,flag = "aimbot_weapon",values = {"Rifle","Pistol","Heavy Pistol","Awp","Scout","Other"},callback = function(val)
+    rifleFrame.Visible = val == "Rifle"
+    pistolFrame.Visible = val == "Pistol"
+    heavypFrame.Visible = val == "Heavy Pistol"
+    awpFrame.Visible = val == "Awp"
+    scoutFrame.Visible = val == "Scout"
+    otherFrame.Visible = val == "Other"
+end})
 
 -- insane code
 rifleGroup:addToggle({text = "Aim Assist",flag = "rifle_assist"})
@@ -694,28 +733,6 @@ otherGroup:addSlider({text = "Smoothness",flag = "other_assist_smoothness",min =
 otherGroup:addSlider({text = "Triggerbot Delay",flag = "other_triggerdelay",min = 0,max = 200,value = 0})
 otherGroup:addList({text = "Hitboxes",flag = "other_hitboxes",multiselect = true,values = {"Head","Torso","Arms","Legs"}})
 
-aimbotGroup:addToggle({text = "Enabled",flag = "aimbot_enabled"})
-aimbotGroup:addToggle({text = "Teammates",flag = "aimbot_team"})
-aimbotGroup:addToggle({text = "Visible Only",flag = "aimbot_visonly"})
-aimbotGroup:addToggle({text = "Auto Pistol",flag = "auto_pistol",callback = function(val)
-    for i,v in next, replicatedStorage.Weapons:GetChildren() do
-        if v:FindFirstChild("Secondary") and v.Name ~= "CZ" then
-            v.Auto.Value = val
-        end
-    end
-end})
-aimbotGroup:addKeybind({text = "Aimbot Key",flag = "aimbot_keybind",key = Enum.KeyCode.LeftAlt})
-aimbotGroup:addList({text = "Aimbot Mode",flag = "aimbot_mode",values = {"Hold","Toggle","Always"}})
-aimbotGroup:addKeybind({text = "Triggerbind",flag = "trigger_keybind",key = Enum.KeyCode.LeftAlt})
-aimbotGroup:addList({text = "Weapon",skipflag = true,flag = "aimbot_weapon",values = {"Rifle","Pistol","Heavy Pistol","Awp","Scout","Other"},callback = function(val)
-    rifleFrame.Visible = val == "Rifle"
-    pistolFrame.Visible = val == "Pistol"
-    heavypFrame.Visible = val == "Heavy Pistol"
-    awpFrame.Visible = val == "Awp"
-    scoutFrame.Visible = val == "Scout"
-    otherFrame.Visible = val == "Other"
-end})
-
 local espGroup,espFrame = visualsTab:createGroup(0)
 local worldGroup,worldFrame = visualsTab:createGroup(0)
 local worldGroup2,worldFrame2 = visualsTab:createGroup(0)
@@ -740,11 +757,15 @@ worldSettings:addToggle({text = "Time Changer",flag = "time_changer",callback = 
     lighting.TimeOfDay = 15
 end})
 worldSettings:addToggle({text = "Skybox Changer",flag = "skybox_changer",callback = updateSkybox})
-worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(val)
-    if not localPlayer.PlayerGui:FindFirstChild("ScreenFlash") then return end
-    if val then
-        localPlayer.PlayerGui.ScreenFlash.Enabled = false
-    else
-        localPlayer.PlayerGui.ScreenFlash.Enabled = true
-    end
+worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(v)
+    localPlayer.PlayerGui.Blnd.Blind.Visible = not v
 end})
+worldSettings:addToggle({text = "Remove Radio",flag = "remove_radio"})
+worldSettings:addToggle({text = "Viewmodel Changer",flag = "viewmodel_changer"})
+
+worldGroup2:addColorpicker({text = "Box Color",ontop = true,flag = "box_color",color = Color3.new(1,1,1)})
+worldGroup2:addColorpicker({text = "Name Color",ontop = true,flag = "name_color",color = Color3.new(1,1,1)})
+worldGroup2:addColorpicker({text = "Health Bar Color",ontop = true,flag = "healthbar_color",color = Color3.new(0.2,0.75,0.2)})
+worldGroup2:addDivider()
+worldGroup2:addColorpicker({text = "Weapon Chams Color",ontop = true,callback = updateViewmodel,flag = "weapon_color",color = Color3.new(0.25,0.15,0.6)})
+worldGroup2:addColorpicker({text = "Arm Chams Color",ontop = true,callback = updateViewmodel,flag = "arm_color",color = Color3.new(0.15,0.05,0.55)})
