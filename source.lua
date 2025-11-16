@@ -22,7 +22,7 @@ if not isfolder("astrixsete/"..tostring(game.GameId)) then
 end
 --vars
 -- LINHA CORRIGIDA ABAIXO
-local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/contaloser1802-stack/cbro-script/main/library.lua"))()
+local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/main/library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
@@ -238,23 +238,23 @@ end
 
 local lastKeybindState = false -- Variável auxiliar para o Toggle
 function checkAimbotActivation()
-    local key = library.flags["aimbot_keybind"]
-    local mode = library.flags["aimbot_mode"]
-    local keyIsDown = isButtonDown(key)
+    local key = library.flags["aimbot_keybind"]
+    local mode = library.flags["aimbot_mode"]
+    local keyIsDown = isButtonDown(key)
 
-    if mode == "Always" then
-        return true
-    elseif mode == "Hold" then
-        return keyIsDown
-    elseif mode == "Toggle" then
-        if keyIsDown and not lastKeybindState then -- Verifica se a tecla foi Pressionada (rising edge)
-            aimbotActive = not aimbotActive
-        end
-        lastKeybindState = keyIsDown -- Atualiza o estado da tecla para o próximo frame
-        return aimbotActive
-    end
+    if mode == "Always" then
+        return true
+    elseif mode == "Hold" then
+        return keyIsDown
+    elseif mode == "Toggle" then
+        if keyIsDown and not lastKeybindState then -- Verifica se a tecla foi Pressionada (rising edge)
+            aimbotActive = not aimbotActive
+        end
+        lastKeybindState = keyIsDown -- Atualiza o estado da tecla para o próximo frame
+        return aimbotActive
+    end
 
-    return false
+    return false
 end
 
 function isButtonDown(key)
@@ -546,8 +546,13 @@ meta.__namecall = newcclosure(function(self,...)
                     hitsound.Volume = library.flags["hitsound_volume"]
                     hitsound:Destroy()
                 end
-                if library.flags["bullet_tracer"] and localPlayer.Character and  camera:FindFirstChild("Arms") then
-                    local from = camera.Arms:FindFirstChild("Flash")
+                -- Lógica do Bullet Tracer corrigida para usar 'Arms' como ponto de partida
+                if library.flags["bullet_tracer"] and localPlayer.Character and camera:FindFirstChild("Arms") then
+                    local from = camera.Arms:FindFirstChild("Flash") -- Assumindo que o ponto de disparo é o 'Flash' no viewmodel 'Arms'
+                    if not from then 
+                        -- Se 'Flash' não for encontrado, tente o braço direito ou um ponto central
+                        from = camera.Arms:FindFirstChild("RightHand") or camera.Arms:FindFirstChild("RightArm") or camera.Arms.PrimaryPart
+                    end
                     if from then
                         createTracer(decodePos(args[2]),from)
                     end
@@ -736,232 +741,12 @@ worldSettings:addToggle({text = "Time Changer",flag = "time_changer",callback = 
     lighting.TimeOfDay = 15
 end})
 worldSettings:addToggle({text = "Skybox Changer",flag = "skybox_changer",callback = updateSkybox})
-worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(v)
-    localPlayer.PlayerGui.Blnd.Blind.Visible = not v
+-- LINHA CORRIGIDA ABAIXO
+worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(val)
+    if not localPlayer.PlayerGui:FindFirstChild("ScreenFlash") then return end
+    if val then
+        localPlayer.PlayerGui.ScreenFlash.Enabled = false
+    else
+        localPlayer.PlayerGui.ScreenFlash.Enabled = true
+    end
 end})
-worldSettings:addToggle({text = "Remove Radio",flag = "remove_radio"})
-worldSettings:addToggle({text = "Viewmodel Changer",flag = "viewmodel_changer"})
-
-worldGroup2:addColorpicker({text = "Box Color",ontop = true,flag = "box_color",color = Color3.new(1,1,1)})
-worldGroup2:addColorpicker({text = "Name Color",ontop = true,flag = "name_color",color = Color3.new(1,1,1)})
-worldGroup2:addColorpicker({text = "Health Bar Color",ontop = true,flag = "healthbar_color",color = Color3.new(0.2,0.75,0.2)})
-worldGroup2:addDivider()
-worldGroup2:addColorpicker({text = "Weapon Chams Color",ontop = true,callback = updateViewmodel,flag = "weapon_color",color = Color3.new(0.25,0.15,0.6)})
-worldGroup2:addColorpicker({text = "Arm Chams Color",ontop = true,callback = updateViewmodel,flag = "arm_color",color = Color3.new(0.15,0.05,0.55)})
-worldGroup2:addDivider()
-worldGroup2:addColorpicker({text = "Tracer Color",ontop = true,flag = "tracer_color",color = Color3.new(1,1,1)})
-
-
--- Restante do código do WorldGroup2 (assumindo que o código original termina na cor do Tracer)
-
-worldGroup2:addSlider({text = "Weapon Transparency",flag = "weapon_trans",min = 0,max = 100,value = 0,callback = updateViewmodel})
-worldGroup2:addSlider({text = "Arm Transparency",flag = "arm_trans",min = 0,max = 100,value = 0,callback = updateViewmodel})
-worldGroup2:addDivider()
-worldGroup2:addSlider({text = "Time (Hours)",flag = "time_value",min = 0,max = 24,value = 15,callback = function(val)
-    lighting.TimeOfDay = val
-end})
-worldGroup2:addList({text = "Skybox",flag = "selected_skybox",values = {"Purple Nebula","Night Sky","Pink Daylight","Morning Glow","Setting Sun","Fade Blue","Elegant Morning","Neptune","Redshift","Aesthetic Night"},callback = updateSkybox})
-worldGroup2:addDivider()
-worldGroup2:addSlider({text = "Viewmodel X",flag = "viewmodel_x",min = 0,max = 40,value = 20})
-worldGroup2:addSlider({text = "Viewmodel Y",flag = "viewmodel_y",min = 0,max = 40,value = 20})
-worldGroup2:addSlider({text = "Viewmodel Z",flag = "viewmodel_z",min = 0,max = 40,value = 20})
-
-drawingGroup:addToggle({text = "Watermark",flag = "watermark",callback = function(v) astrixseteWatermark.Visible = v end})
-drawingGroup:addToggle({text = "Spectator List",flag = "speclist",callback = function(v) speclistText.Visible = v end})
-
-local miscGroup = miscTab:createGroup(0)
-miscGroup:addToggle({text = "No Fall Damage",flag = "fall_damage"})
-miscGroup:addToggle({text = "No Fire Damage",flag = "fire_damage"})
-miscGroup:addToggle({text = "Unlock Skins",flag = "unlock_skins",callback = function(v) unlockInventory = v end})
-miscGroup:addList({text = "Hitsound",flag = "hitsound_value",values = {"Bameware","Bell","Bubble","Pick","Pop","Rust","Skeet","Neverlose","Minecraft"}})
-miscGroup:addSlider({text = "Hitsound Volume",flag = "hitsound_volume",min = 0,max = 1,value = 1})
-miscGroup:addToggle({text = "Hitsound",flag = "hitsound_enabled"})
-
--- loops
-runService.RenderStepped:Connect(function()
-    if menu.Enabled then
-        userInputService.MouseBehavior = Enum.MouseBehavior.Default
-    else
-        userInputService.MouseBehavior = Enum.MouseBehavior.LockCenter
-    end
-
-    if localPlayer.Character and localPlayer.Character:FindFirstChild("Humanoid") then
-        if hookJp and localPlayer.Character.Humanoid.JumpPower ~= 22 then
-            localPlayer.Character.Humanoid.JumpPower = 22
-        end
-    end
-
-    if library.flags["watermark"] then
-        astrixseteWatermark.Text = "astrixsete | v"..ver
-        astrixseteWatermark.Color = library.libColor
-        astrixseteWatermark.Position = Vector2.new(50,24)
-    end
-    if library.flags["speclist"] then
-        local speclist = {}
-        local text = "Spectators: "
-        for i,v in next, players:GetPlayers() do
-            if v.Character and not v.Character:FindFirstChild("HumanoidRootPart") and v ~= localPlayer then
-                table.insert(speclist,v.Name)
-            end
-        end
-        if #speclist > 0 then
-            speclistText.Text = text..table.concat(speclist,", ")
-        else
-            speclistText.Text = text.."None"
-        end
-    end
-
-    if library.flags["aimbot_enabled"] and isAlive() then
-
-        local shouldAim = checkAimbotActivation() -- CHECA A ATIVAÇÃO AQUI
-
-        local target,dist = getNearest(library.flags["aimbot_visonly"],library.flags["aimbot_team"])
-
-        if target and target.Character and localPlayer.Character and localPlayer.Character.EquippedTool.Value and localPlayer.Character:FindFirstChild("EquippedTool") then
-            local weapon = getWeaponInfo()
-            if weapon.aim_assist or weapon.silent_aim then
-                if weapon.aim_assist and dist <= weapon.assist_fov and shouldAim then
-                    local hit,pos = nil,nil
-                    for i,v in next, weapon.hitboxes do
-                        if target.Character:FindFirstChild(v) and target.Character[v]:IsA("BasePart") then
-                            local ray = Ray.new(camera.CFrame.p,(target.Character[v].Position - camera.CFrame.p).unit * 500)
-                            local hitRay,_ = workspace:FindPartOnRayWithIgnoreList(ray, {camera,localPlayer.Character,workspace.Ray_Ignore,workspace.Map.Clips,workspace.Map.SpawnPoints})
-                            if hitRay and hitRay:IsDescendantOf(target.Character) then
-                                hit,pos = target.Character[v],target.Character[v].Position
-                                break
-                            end
-                        end
-                    end
-
-                    if hit and pos then
-                        local vector,onScreen = camera:WorldToScreenPoint(pos)
-                        local mouseVector = Vector2.new(mouse.X,mouse.Y)
-                        local targetVector = Vector2.new(vector.X,vector.Y)
-                        local unit = (targetVector - mouseVector).unit
-                        local distance = (targetVector - mouseVector).magnitude
-                        
-                        if distance > 1 then
-                            mouse.X = mouse.X + unit.X * math.min(distance/weapon.smoothness,distance)
-                            mouse.Y = mouse.Y + unit.Y * math.min(distance/weapon.smoothness,distance)
-                        end
-                    end
-                end
-
-                if weapon.silent_aim and dist <= weapon.silent_fov and shouldAim then
-                    local hit,pos = nil,nil
-                    for i,v in next, weapon.hitboxes do
-                        if target.Character:FindFirstChild(v) and target.Character[v]:IsA("BasePart") then
-                            local ray = Ray.new(camera.CFrame.p,(target.Character[v].Position - camera.CFrame.p).unit * 500)
-                            local hitRay,_ = workspace:FindPartOnRayWithIgnoreList(ray, {camera,localPlayer.Character,workspace.Ray_Ignore,workspace.Map.Clips,workspace.Map.SpawnPoints})
-                            if hitRay and hitRay:IsDescendantOf(target.Character) then
-                                hit,pos = target.Character[v],target.Character[v].Position
-                                break
-                            end
-                        end
-                    end
-                    if hit and pos then
-                        silentPart = hit
-                    else
-                        silentPart = nil
-                    end
-                else
-                    silentPart = nil
-                end
-            else
-                silentPart = nil
-            end
-            if weapon.triggerbot and isButtonDown(library.flags["trigger_keybind"]) and weapon.silent_aim then
-                local ray = Ray.new(camera.CFrame.p,(target.Character.Head.Position - camera.CFrame.p).unit * 500)
-                local hit,_ = workspace:FindPartOnRayWithIgnoreList(ray, {camera,localPlayer.Character,workspace.Ray_Ignore,workspace.Map.Clips,workspace.Map.SpawnPoints})
-                if hit and hit:IsDescendantOf(target.Character) then
-                    localPlayer.Character.EquippedTool.Value:FireServer("Fire",decodePos(client.firebullet(client,0,true,0)))
-                end
-            end
-        else
-            silentPart = nil
-        end
-
-        if not shouldAim then -- GARANTE QUE DESLIGA SE A KEYBIND NÃO ESTIVER ATIVA
-            silentPart = nil
-        end
-
-    else
-        silentPart = nil
-    end
-    
-    if timeout > 0 then timeout -= 1 end
-    if lighting.TimeOfDay ~= library.flags["time_value"] and library.flags["time_changer"] then
-        lighting.TimeOfDay = library.flags["time_value"]
-    end
-    updateViewmodel()
-
-    for i,v in next, espObjects do
-        local plr = players:FindFirstChild(i)
-        if plr and isAlive(plr) and plr ~= localPlayer and plr.Team ~= localPlayer.Team and library.flags["esp_enabled"] then
-            v.text.Visible = library.flags["name_enabled"]
-            v.textshadow.Visible = library.flags["name_enabled"]
-            v.box.Visible = library.flags["box_enabled"]
-            v.boxol.Visible = library.flags["box_enabled"]
-            v.boxil.Visible = library.flags["box_enabled"]
-            v.healthb.Visible = library.flags["healthbar_enabled"]
-            v.healthbo.Visible = library.flags["healthbar_enabled"]
-
-            local headPos,onScreen = camera:WorldToScreenPoint(plr.Character.Head.Position+Vector3.new(0,0.5,0))
-            local footPos,_ = camera:WorldToScreenPoint(plr.Character.HumanoidRootPart.Position-Vector3.new(0,2,0))
-
-            local height = footPos.Y-headPos.Y
-            local width = height/2.5
-
-            local center = Vector2.new(headPos.X,headPos.Y)
-            local box = {
-                Position = Vector2.new(center.X-width/2,center.Y),
-                Size = Vector2.new(width,height)
-            }
-            
-            v.text.Text = plr.Name.." ["..math.floor(plr.Character.Humanoid.Health).."hp]"
-            v.text.Position = Vector2.new(box.Position.X+box.Size.X/2-v.text.TextBounds.X/2,box.Position.Y-20)
-            v.text.Color = library.flags["name_color"]
-
-            v.textshadow.Text = plr.Name.." ["..math.floor(plr.Character.Humanoid.Health).."hp]"
-            v.textshadow.Position = Vector2.new(box.Position.X+box.Size.X/2-v.text.TextBounds.X/2+1,box.Position.Y-19)
-
-            v.box.Position = floor(box.Position)
-            v.box.Size = floor(box.Size)
-            v.box.Color = library.flags["box_color"]
-
-            v.boxol.Position = floor(box.Position-Vector2.new(1,1))
-            v.boxol.Size = floor(box.Size+Vector2.new(2,2))
-
-            v.boxil.Position = floor(box.Position+Vector2.new(1,1))
-            v.boxil.Size = floor(box.Size-Vector2.new(2,2))
-
-            local maxHealth = 100
-            local health = plr.Character.Humanoid.Health
-            local hp = health/maxHealth
-            local barHeight = box.Size.Y*hp
-
-            v.healthb.Size = Vector2.new(3,barHeight)
-            v.healthb.Position = Vector2.new(box.Position.X-4,box.Position.Y+box.Size.Y-barHeight)
-            v.healthb.Filled = true
-            v.healthb.Color = library.flags["healthbar_color"]
-
-            v.healthbo.Position = Vector2.new(box.Position.X-5,box.Position.Y-1)
-            v.healthbo.Size = Vector2.new(5,box.Size.Y+2)
-            v.healthbo.Filled = false
-        else
-            v.invis()
-        end
-    end
-end)
-
-
--- events
-players.PlayerAdded:Connect(createEsp)
-for i,v in next, players:GetPlayers() do
-    createEsp(v)
-end
-players.PlayerRemoving:Connect(function(plr)
-    if espObjects[plr.Name] then
-        espObjects[plr.Name].remove()
-    end
-end)
