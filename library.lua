@@ -5,24 +5,106 @@ local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
 local players = game:GetService("Players")
 local lighting = game:GetService("Lighting")
+local CoreGui = game:GetService("CoreGui") -- Adicionado para referência direta
 local localPlayer = players.LocalPlayer
 local camera = workspace.CurrentCamera
 local mouse = localPlayer:GetMouse()
 
-local menu = game:GetObjects("rbxassetid://7142010382")[1]
-local tabholder = menu.outline.outline.main.group
-menu.outline.Position = UDim2.new(0.5,-menu.outline.Size.X.Offset/2,0.5,-menu.outline.Size.Y.Offset/2)
-menu.Parent = game:GetService("CoreGui")
+-- BLOCO CORRIGIDO: Substitui o carregamento por Asset ID pela criação manual da UI.
+-- Isso elimina a dependência do ID 'rbxassetid://7142010382'.
+
+local menu = Instance.new("ScreenGui")
+menu.Name = "ASTRIXSETE_MENU"
+menu.Parent = CoreGui
+menu.IgnoreGuiInset = true
+
+local menuOutline = Instance.new("Frame")
+menuOutline.Name = "outline"
+menuOutline.Size = UDim2.new(0, 500, 0, 300) -- Tamanho do menu
+menuOutline.Position = UDim2.new(0.5, -250, 0.5, -150) -- Centraliza
+menuOutline.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+menuOutline.BorderSizePixel = 0
+menuOutline.Parent = menu
+Instance.new("UICorner", menuOutline).CornerRadius = UDim.new(0, 8) -- Arredonda Outline
+
+local menuOutlineOutline = Instance.new("Frame")
+menuOutlineOutline.Name = "outline"
+menuOutlineOutline.Size = UDim2.new(1, 0, 1, 0)
+menuOutlineOutline.BackgroundTransparency = 1
+menuOutlineOutline.Parent = menuOutline
+Instance.new("UICorner", menuOutlineOutline).CornerRadius = UDim.new(0, 6) -- Arredonda Outline Interna
+
+local mainMenu = Instance.new("Frame")
+mainMenu.Name = "main"
+mainMenu.Size = UDim2.new(1, 0, 1, 0)
+mainMenu.BackgroundTransparency = 1
+mainMenu.Parent = menuOutlineOutline
+
+local tabGroup = Instance.new("Frame")
+tabGroup.Name = "group"
+tabGroup.Size = UDim2.new(1, 0, 1, 0)
+tabGroup.BackgroundTransparency = 1
+tabGroup.Parent = mainMenu
+
+-- Define o tabholder corretamente para que o resto do script funcione
+local tabholder = tabGroup
+
+-- Cria o título
+local titleText = Instance.new("TextLabel")
+titleText.Name = "text"
+titleText.Text = "ASTRIXSETE" -- ALTERAÇÃO 3: NOME DO PAINEL
+titleText.BackgroundTransparency = 1
+titleText.TextColor3 = Color3.new(1, 1, 1)
+titleText.Font = Enum.Font.SourceSansBold
+titleText.TextSize = 20
+titleText.Size = UDim2.new(1, 0, 0, 30)
+titleText.Parent = mainMenu
+
+-- Cria os containers mínimos que o addTab espera
+local tabButtonHolder = Instance.new("Frame")
+tabButtonHolder.Name = "tabbuttons"
+tabButtonHolder.Size = UDim2.new(1, 0, 0, 30)
+tabButtonHolder.BackgroundTransparency = 1
+tabButtonHolder.Parent = tabGroup
+Instance.new("UIListLayout", tabButtonHolder).FillDirection = Enum.FillDirection.Horizontal
+
+local tabFrame = Instance.new("Frame")
+tabFrame.Name = "tab"
+tabFrame.BackgroundTransparency = 1
+tabFrame.Parent = tabGroup
+tabFrame.Size = UDim2.new(1,0,1,-30) -- Ajuste de tamanho para acomodar botões
+
+local tabButton = Instance.new("TextButton")
+tabButton.Name = "button"
+tabButton.BackgroundTransparency = 1
+tabButton.Text = "Tab"
+tabButton.Parent = tabButtonHolder
+
+local leftPanel = Instance.new("Frame")
+leftPanel.Name = "left"
+leftPanel.BackgroundTransparency = 1
+leftPanel.Size = UDim2.new(0.5, -5, 1, -30) -- Tamanho para painel esquerdo
+leftPanel.Position = UDim2.new(0, 0, 0, 30)
+leftPanel.Parent = tabFrame
+Instance.new("UIListLayout", leftPanel).FillDirection = Enum.FillDirection.Vertical
+Instance.new("UIListLayout", leftPanel).Padding = UDim.new(0,5)
+
+local rightPanel = Instance.new("Frame")
+rightPanel.Name = "right"
+rightPanel.BackgroundTransparency = 1
+rightPanel.Size = UDim2.new(0.5, -5, 1, -30) -- Tamanho para painel direito
+rightPanel.Position = UDim2.new(0.5, 5, 0, 30)
+rightPanel.Parent = tabFrame
+Instance.new("UIListLayout", rightPanel).FillDirection = Enum.FillDirection.Vertical
+Instance.new("UIListLayout", rightPanel).Padding = UDim.new(0,5)
+
+-- FIM DO BLOCO CORRIGIDO
 
 -- ALTERAÇÃO 1: COR DE DESTAQUE (AZUL GELO)
 local library = {name = "Counter Blox",colorpicking = false,tabbuttons = {},tabs = {},options = {},flags = {},scrolling = false,notifyText = Drawing.new("Text"),playing = false,multiZindex = 100,toInvis = {},libColor = Color3.fromRGB(80,160,255),blacklisted = {Enum.KeyCode.W,Enum.KeyCode.A,Enum.KeyCode.S,Enum.KeyCode.D,Enum.UserInputType.MouseMovement}}
 
 function draggable(a)local b=userInputService;local c;local d;local e;local f;local function g(h)if not library.colorpicking then local i=h.Position-e;a.Position=UDim2.new(f.X.Scale,f.X.Offset+i.X,f.Y.Scale,f.Y.Offset+i.Y)end end;a.InputBegan:Connect(function(h)if h.UserInputType==Enum.UserInputType.MouseButton1 or h.UserInputType==Enum.UserInputType.Touch then c=true;e=h.Position;f=a.Position;h.Changed:Connect(function()if h.UserInputState==Enum.UserInputState.End then c=false end end)end end)a.InputChanged:Connect(function(h)if h.UserInputType==Enum.UserInputType.MouseMovement or h.UserInputType==Enum.UserInputType.Touch then d=h end end)b.InputChanged:Connect(function(h)if h==d and c then g(h)end end)end
-draggable(menu.outline)
-
--- ALTERAÇÃO 2: ARREDONDAR PAINEL PRINCIPAL (Outline e Outline Interno)
-Instance.new("UICorner", menu.outline).CornerRadius = UDim.new(0, 8)
-Instance.new("UICorner", menu.outline.outline).CornerRadius = UDim.new(0, 6)
+draggable(menuOutline) -- Mudei de 'menu.outline' para a variável local 'menuOutline'
 
 local cursor = Drawing.new("Image")
 cursor.Data = game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/refs/heads/main/cursor.png")
@@ -47,8 +129,8 @@ userInputService.InputEnded:Connect(function(key)
     end
 end)
 
--- ALTERAÇÃO 3: NOME DO PAINEL
-menu.outline.outline.main.text.Text = "ASTRIXSETE"
+-- A LINHA ABAIXO FOI MOVIDA PARA O BLOCO DE CRIAÇÃO MANUAL:
+-- menu.outline.outline.main.text.Text = "ASTRIXSETE"
 
 function library:notify(text)
     if playing then return end
@@ -69,18 +151,20 @@ function library:notify(text)
     end)
 end
 function library:addTab(name)
-    local newTab = tabholder.tab:Clone()
-    local newButton = tabholder.tabbuttons.button:Clone()
+    local newTab = tabFrame:Clone() -- Usa o tabFrame criado manualmente
+    local newButton = tabButton:Clone() -- Usa o tabButton criado manualmente
 
     table.insert(library.tabs,newTab)
     newTab.Parent = tabholder
     newTab.Visible = false
+	newTab.Name = name:gsub(" ","") -- Adiciona um nome para evitar confusão
 
     table.insert(library.tabbuttons,newButton)
-    newButton.Parent = tabholder.tabbuttons
+    newButton.Parent = tabButtonHolder
     newButton.Modal = true
     newButton.Visible = true
     newButton.Text = name
+	newButton.Name = name:gsub(" ","") -- Adiciona um nome
 
     newButton.MouseButton1Click:Connect(function()
         for i,v in next, library.tabs do
@@ -733,13 +817,4 @@ function library:addTab(name)
                 end)
                 local leave
                 leave = picker.MouseLeave:connect(function()
-                    input:disconnect()
-                    leave:disconnect()
-                end)
-            end)
-        end
-    end
-    return tab
-end
-
-return library
+                    input:disco
