@@ -21,7 +21,6 @@ if not isfolder("astrixsete/"..tostring(game.GameId)) then
     makefolder("astrixsete/"..tostring(game.GameId))
 end
 --vars
--- LINHA CORRIGIDA ABAIXO
 local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/main/library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
@@ -705,8 +704,8 @@ aimbotGroup:addToggle({text = "Auto Pistol",flag = "auto_pistol",callback = func
         end
     end
 end})
-aimbotGroup:addKeybind({text = "Aimbot Key",flag = "aimbot_keybind",key = Enum.KeyCode.LeftAlt}) -- NOVO
-aimbotGroup:addList({text = "Aimbot Mode",flag = "aimbot_mode",values = {"Hold","Toggle","Always"}}) -- NOVO
+aimbotGroup:addKeybind({text = "Aimbot Key",flag = "aimbot_keybind",key = Enum.KeyCode.LeftAlt})
+aimbotGroup:addList({text = "Aimbot Mode",flag = "aimbot_mode",values = {"Hold","Toggle","Always"}})
 aimbotGroup:addKeybind({text = "Triggerbind",flag = "trigger_keybind",key = Enum.KeyCode.LeftAlt})
 aimbotGroup:addList({text = "Weapon",skipflag = true,flag = "aimbot_weapon",values = {"Rifle","Pistol","Heavy Pistol","Awp","Scout","Other"},callback = function(val)
     rifleFrame.Visible = val == "Rifle"
@@ -741,7 +740,6 @@ worldSettings:addToggle({text = "Time Changer",flag = "time_changer",callback = 
     lighting.TimeOfDay = 15
 end})
 worldSettings:addToggle({text = "Skybox Changer",flag = "skybox_changer",callback = updateSkybox})
--- LINHA CORRIGIDA ABAIXO
 worldSettings:addToggle({text = "Remove Flash",flag = "remove_flash",callback = function(val)
     if not localPlayer.PlayerGui:FindFirstChild("ScreenFlash") then return end
     if val then
