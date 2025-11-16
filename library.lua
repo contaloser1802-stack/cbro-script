@@ -42,7 +42,7 @@ userInputService.InputEnded:Connect(function(key)
     end
 end)
 
-menu.outline.outline.main.text.Text = "alora"
+menu.outline.outline.main.text.Text = "ASTRIXSETE"
 
 function library:notify(text)
     if playing then return end
