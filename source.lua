@@ -21,7 +21,8 @@ if not isfolder("astrixsete/"..tostring(game.GameId)) then
     makefolder("astrixsete/"..tostring(game.GameId))
 end
 --vars
-local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/contaloser1802-stack/cbro-script/main/library.lua"))()
+-- LINHA CORRIGIDA ABAIXO
+local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/sj0rs1/alora/main/library.lua"))()
 local userInputService = game:GetService("UserInputService")
 local replicatedStorage = game:GetService("ReplicatedStorage")
 local runService = game:GetService("RunService")
@@ -324,7 +325,7 @@ function createTracer(to,from)
 end
 
 oldSounds = {}
-for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY CODE!!!!
+for i,v in next, localPlayer.PlayerGui.Music:GetDescendants() do -- this is MY CODE!!!
 	if v:IsA("Sound") then
 		if v.Name == "Lose" then
 			oldSounds["Lose"] = v.SoundId
