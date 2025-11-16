@@ -1,5 +1,3 @@
-LIBRARY
-
 -- I don't recommend using any of this code since its not near optimal.
 
 local userInputService = game:GetService("UserInputService")
