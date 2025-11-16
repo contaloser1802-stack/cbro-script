@@ -14,11 +14,11 @@ if game:GetService("CoreGui"):FindFirstChild("sjorlib") then return end
 getgenv().error = function() end
 local ver = "1.0.1"
 --files
-if not isfolder("alora") then
-    makefolder("alora")
+if not isfolder("astrixsete") then
+    makefolder("astrixsete")
 end
-if not isfolder("alora/"..tostring(game.GameId)) then
-    makefolder("alora/"..tostring(game.GameId))
+if not isfolder("astrixsete/"..tostring(game.GameId)) then
+    makefolder("astrixsete/"..tostring(game.GameId))
 end
 --vars
 local library,menu,tabholder = loadstring(game:HttpGet("https://raw.githubusercontent.com/contaloser1802-stack/cbro-script/main/library.lua"))()
@@ -1184,7 +1184,7 @@ function onStep()
         local seconds = string.len(sec) == 2 and sec or "0"..sec
         local minutes = string.len(min) == 2 and min or "0"..min
         local hours = string.len(hrs) == 2 and hrs or "0"..hrs
-        aloraWatermark.Text = "alora | "..ver.." | "..hours..":"..minutes..":"..seconds
+        aloraWatermark.Text = "astrixsete | "..ver.." | "..hours..":"..minutes..":"..seconds
     end
 end
 runService.RenderStepped:Connect(onStep)
